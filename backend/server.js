@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const chats = require("./data/data");
+const connectMongoDB = require("./config/mongoDBConfig");
 
 const server = express();
 dotenv.config();
@@ -21,6 +22,9 @@ server.get("/api/chats/:id", (req, res) => {
 
 const port = process.env.PORT || 5000;
 
-server.listen(port, () => {
-  console.log(`Server started on port ${port}`);
+connectMongoDB((client) => {
+  server.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+    console.log(`mongoDB connected: ${client.connection.host}`);
+  });
 });
