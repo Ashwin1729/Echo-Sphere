@@ -1,5 +1,7 @@
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
+const generateJWT = require("../config/generateJwt");
+const bcrypt = require("bcryptjs");
 
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, pic } = req.body;
@@ -16,21 +18,46 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("User Already Exists");
   }
 
+  const hashedPassword = await bcrypt.hash(password, 12);
+
   const user = new User({
     name,
     email,
-    password,
+    password: hashedPassword,
     pic,
   });
 
   const result = await user.save();
 
   if (result) {
-    res.status(201).json(user);
+    res.status(201).json({
+      ...result._doc,
+      token: generateJWT(result._id),
+    });
   } else {
     res.status(400);
     throw new Error("Failed to create a user");
   }
 });
 
-module.exports = { registerUser };
+const authUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  const matchedPassword = await bcrypt.compare(password, user.password);
+
+  if (user && matchedPassword) {
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      pic: user.pic,
+    });
+  } else {
+    res.status(401);
+    throw new Error("Invalid Email or Password");
+  }
+};
+
+module.exports = { registerUser, authUser };
