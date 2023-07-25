@@ -29,9 +29,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const result = await user.save();
 
+  const data = result._doc;
+
   if (result) {
     res.status(201).json({
-      ...result._doc,
+      _id: data._id,
+      name: data.name,
+      email: data.email,
+      pic: data.pic,
       token: generateJWT(result._id),
     });
   } else {
