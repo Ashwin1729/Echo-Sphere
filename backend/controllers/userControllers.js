@@ -37,7 +37,7 @@ const registerUser = asyncHandler(async (req, res) => {
       name: data.name,
       email: data.email,
       pic: data.pic,
-      token: generateJWT(result._id),
+      token: generateJWT(data._id),
     });
   } else {
     res.status(400);
@@ -58,6 +58,7 @@ const authUser = async (req, res) => {
       name: user.name,
       email: user.email,
       pic: user.pic,
+      token: generateJWT(user._id),
     });
   } else {
     res.status(401);
@@ -65,4 +66,25 @@ const authUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, authUser };
+const allUsers = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          {
+            name: { $regex: req.query.search, $options: "i" },
+            _id: { $ne: req.user._id.toString() },
+          },
+          {
+            email: { $regex: req.query.search, $options: "i" },
+            _id: { $ne: req.user._id.toString() },
+          },
+        ],
+      }
+    : {};
+
+  const users = await User.find(keyword);
+
+  res.send(users);
+});
+
+module.exports = { registerUser, authUser, allUsers };
