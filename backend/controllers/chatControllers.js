@@ -1,0 +1,140 @@
+const asyncHandler = require("express-async-handler");
+const Chat = require("../models/chatModel");
+
+const accessChat = asyncHandler(async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    console.log("UserId param not sent with request");
+    return res.sendStatus(400);
+  }
+
+  const isChat = await Chat.find({
+    isGroupChat: false,
+    $and: [
+      { users: { $elemMatch: { $eq: req.user._id.toString() } } },
+      { users: { $elemMatch: { $eq: userId } } },
+    ],
+  })
+    .populate("users", "-password")
+    .populate("latestMessage")
+    .populate({
+      path: "latestMessage.sender",
+      select: "name pic email",
+      model: "User",
+    });
+
+  //   isChat = await User.populate(isChat, {
+  //     path: "latestMessage",
+  //     select: "name pic email",
+  //   });
+
+  if (isChat.length > 0) {
+    res.send(isChat[0]);
+  } else {
+    const chatData = {
+      chatName: "sender",
+      isGroupChat: false,
+      users: [req.user._id, userId],
+    };
+
+    try {
+      const createdChat = new Chat(chatData);
+      const result = await createdChat.save();
+      const data = result._doc;
+
+      const fullChat = await Chat.findOne({ _id: data._id }).populate(
+        "users",
+        "-password"
+      );
+
+      console.log(fullChat);
+      res.status(200).json(fullChat);
+    } catch (error) {
+      res.status(400);
+      throw new Error(error.message);
+    }
+  }
+});
+
+const fetchChats = asyncHandler(async (req, res) => {
+  try {
+    const chats = await Chat.find({
+      users: { $elemMatch: { $eq: req.user._id.toString() } },
+    })
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password")
+      .populate("latestMessage")
+      .populate({
+        path: "latestMessage.sender",
+        select: "name pic email",
+        model: "User",
+      });
+    res.send(chats);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+const createGroupChat = asyncHandler(async (req, res) => {
+  if (!req.body.users || !req.body.name) {
+    return res.status(400).send({ message: "Please Fill all the feilds" });
+  }
+
+  const users = JSON.parse(req.body.users);
+
+  if (users.length < 2) {
+    return res
+      .status(400)
+      .send("More than 2 users are required to form a group chat");
+  }
+
+  users.push(req.user);
+
+  try {
+    const groupChat = new Chat({
+      chatName: req.body.name,
+      isGroupChat: true,
+      users: users,
+      groupAdmin: req.user._id.toString(),
+    });
+
+    const result = await groupChat.save();
+    const data = result._doc;
+
+    const finalGroupChat = await Chat.findOne({ _id: data._id })
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
+
+    res.status(200).json(finalGroupChat);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+const renameGroup = asyncHandler(async (req, res) => {
+  const { chatId, chatName } = req.body;
+
+  const updatedChat = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      chatName: chatName,
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!updatedChat) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(updatedChat);
+  }
+});
+
+module.exports = { accessChat, fetchChats, createGroupChat, renameGroup };
