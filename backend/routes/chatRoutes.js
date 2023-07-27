@@ -5,6 +5,8 @@ const {
   fetchChats,
   createGroupChat,
   renameGroup,
+  addToGroup,
+  removeFromGroup,
 } = require("../controllers/chatControllers");
 
 const router = express.Router();
@@ -13,7 +15,7 @@ router.post("/", protect, accessChat);
 router.get("/", protect, fetchChats);
 router.post("/group", protect, createGroupChat);
 router.put("/rename", protect, renameGroup);
-// router.route("/groupremove").put(protect, removeFromGroup);
-// router.route("/groupadd").put(protect, addToGroup);
+router.put("/groupadd", protect, addToGroup);
+router.put("/groupremove", protect, removeFromGroup);
 
 module.exports = router;
