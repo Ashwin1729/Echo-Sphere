@@ -60,6 +60,7 @@ const GroupChatModal = ({ children }) => {
         isClosable: true,
         position: "bottom-left",
       });
+      setLoading(false);
     }
   };
 
