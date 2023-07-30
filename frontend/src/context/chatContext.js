@@ -15,7 +15,7 @@ const ChatContextProvider = ({ children }) => {
     if (!userInfo) {
       history.push("/");
     }
-  }, []);
+  }, [history]);
 
   const store = {
     user,
