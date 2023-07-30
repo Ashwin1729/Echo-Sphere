@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
+const User = require("../models/userModel");
 
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
@@ -17,17 +18,18 @@ const accessChat = asyncHandler(async (req, res) => {
     ],
   })
     .populate("users", "-password")
-    .populate("latestMessage")
     .populate({
-      path: "latestMessage.sender",
-      select: "name pic email",
-      model: "User",
+      path: "latestMessage",
+      populate: {
+        path: "sender",
+        select: "name pic email",
+      },
     });
 
-  //   isChat = await User.populate(isChat, {
-  //     path: "latestMessage",
-  //     select: "name pic email",
-  //   });
+  // isChat = await User.populate(isChat, {
+  //   path: "latestMessage.sender",
+  //   select: "name pic email",
+  // });
 
   if (isChat.length > 0) {
     res.send(isChat[0]);
@@ -64,11 +66,12 @@ const fetchChats = asyncHandler(async (req, res) => {
     })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
-      .populate("latestMessage")
       .populate({
-        path: "latestMessage.sender",
-        select: "name pic email",
-        model: "User",
+        path: "latestMessage",
+        populate: {
+          path: "sender",
+          select: "name pic email",
+        },
       });
     res.send(chats);
   } catch (error) {
