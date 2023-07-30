@@ -7,7 +7,7 @@ import axios from "axios";
 import { getSender } from "../config/chatHelper";
 import GroupChatModal from "./passive_components/GroupChatModal";
 
-const ChatsList = () => {
+const ChatsList = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
 
   const chatCtx = useContext(ChatContext);
@@ -44,7 +44,7 @@ const ChatsList = () => {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
 
   return (
     <Box
