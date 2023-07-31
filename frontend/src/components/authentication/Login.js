@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   FormControl,
   FormLabel,
@@ -11,12 +11,16 @@ import {
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { ChatContext } from "../../context/chatContext";
 
 const Login = () => {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
   const toast = useToast();
   const history = useHistory();
+
+  const chatCtx = useContext(ChatContext);
+  const setUser = chatCtx.setUser;
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
@@ -57,6 +61,7 @@ const Login = () => {
         position: "bottom",
       });
 
+      setUser(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
       history.push("/chats");

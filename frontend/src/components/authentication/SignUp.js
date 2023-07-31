@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   FormControl,
   FormLabel,
@@ -12,6 +12,7 @@ import {
 
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { ChatContext } from "../../context/chatContext";
 
 const SignUp = () => {
   const [show, setShow] = useState(false);
@@ -21,6 +22,9 @@ const SignUp = () => {
   const [password, setPassword] = useState();
   const [pic, setPic] = useState();
   const [picLoading, setPicLoading] = useState(false);
+
+  const chatCtx = useContext(ChatContext);
+  const setUser = chatCtx.setUser;
 
   const toast = useToast();
   const history = useHistory();
@@ -121,6 +125,7 @@ const SignUp = () => {
         isClosable: true,
         position: "bottom",
       });
+      setUser(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
       setPicLoading(false);
       history.push("/chats");
