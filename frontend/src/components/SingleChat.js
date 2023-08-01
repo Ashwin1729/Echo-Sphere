@@ -36,6 +36,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const user = chatCtx.user;
   const selectedChat = chatCtx.selectedChat;
   const setSelectedChat = chatCtx.setSelectedChat;
+  const notifications = chatCtx.notifications;
+  const setNotifications = chatCtx.setNotifications;
 
   const defaultOptions = {
     loop: true,
@@ -134,7 +136,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       const timeNow = new Date().getTime();
       const timeDiff = timeNow - lastTypingTime;
 
-      console.log(timeDiff >= timerLength, typing);
       if (timeDiff >= timerLength && typing) {
         socket.emit("stop typing", selectedChat._id);
         setTyping(false);
@@ -157,13 +158,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
+  console.log(notifications);
+
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageRecieved.chat._id
       ) {
-        // notification logic
+        if (!notifications.includes(newMessageRecieved)) {
+          setNotifications([newMessageRecieved, ...notifications]);
+          setFetchAgain(!fetchAgain);
+        }
       } else {
         setMessages([...messages, newMessageRecieved]);
       }

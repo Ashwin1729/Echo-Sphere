@@ -7,6 +7,7 @@ const ChatContextProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [selectedChat, setSelectedChat] = useState();
   const [chats, setChats] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -24,6 +25,8 @@ const ChatContextProvider = ({ children }) => {
     setSelectedChat,
     chats,
     setChats,
+    notifications,
+    setNotifications,
   };
 
   return <ChatContext.Provider value={store}>{children}</ChatContext.Provider>;
