@@ -4,10 +4,9 @@ Its a MERN stack responsive real time Chat Application.
 
 Deployment link - https://echo-sphere-x2oq.onrender.com/
 
-test data for login
-
-email - test@gmail.com
-password - ashwin123
+Test data for login -
+- Email - test@gmail.com
+- Password - ashwin123
 
 ### Features
 
