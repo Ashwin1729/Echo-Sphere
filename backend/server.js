@@ -21,6 +21,8 @@ server.use("/api/message", messageRoutes);
 // ------------------------- Deployment ----------------------------
 
 const _dirname = path.resolve();
+console.log(path.join(_dirname, "/frontend/build"));
+
 if (process.env.NODE_ENV === "production") {
   server.use(express.static(path.join(_dirname, "/frontend/build")));
 
