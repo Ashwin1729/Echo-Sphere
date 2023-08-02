@@ -20,7 +20,7 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import "../App.css";
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = process.env.BASE_URL;
 let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {

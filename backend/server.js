@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const dotenv = require("dotenv");
 const { Server } = require("socket.io");
 
@@ -13,13 +14,26 @@ dotenv.config();
 
 server.use(express.json());
 
-server.get("/", (req, res) => {
-  res.send("API is running successfuly");
-});
-
 server.use("/api/user", userRoutes);
 server.use("/api/chat", chatRoutes);
 server.use("/api/message", messageRoutes);
+
+// ------------------------- Deployment ----------------------------
+
+const _dirname = path.resolve();
+if (process.env.NODE_ENV === "production") {
+  server.use(express.static(path.join(_dirname, "/frontend/build")));
+
+  server.get("*", (req, res) => {
+    res.sendFile(path.resolve(_dirname, "frontend", "build", "index.html"));
+  });
+} else {
+  server.get("/", (req, res) => {
+    res.send("API is running successfuly");
+  });
+}
+
+// ------------------------- Deployment ----------------------------
 
 server.use(notFound);
 server.use(errorHandler);
