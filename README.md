@@ -10,7 +10,7 @@ Test data for login -
 
 ### Features
 
-- User can create one on one chats or group chats with other users
+- User can create one on one chats or group chats with other users.
 - User can search other registered user by their name and email and can start chatting with them in real time or add them in a group.
 - User need to authenticate themselves in order to use the application. So the application contains user login and sign up feature.
 - User can create a group, edit a group, add members to it (admin only), remove members from it (admin only) and can leave the group if he wants to.
